@@ -1,0 +1,13 @@
+{
+  "name": "DS Doc Assistant",
+  "id": "ds-doc-assistant-001",
+  "api": "1.0.0",
+  "editorType": ["figma", "figjam"],
+  "main": "code.js",
+  "ui": "ui.html",
+  "documentAccess": "dynamic-page",
+  "networkAccess": {
+    "allowedDomains": ["https://agqyllozyhunxcenoysw.supabase.co"]
+  },
+  "permissions": []
+}

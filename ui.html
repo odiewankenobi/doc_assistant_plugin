@@ -1,0 +1,848 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>DS Doc Assistant</title>
+<style>
+  /* ── Reset & Variables ─────────────────────────────────────── */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  button, input, select, textarea { font-family: inherit; font-size: inherit; }
+
+  :root {
+    /* ── DS Color Tokens — primitivos ───────────────────────── */
+    --ds-black-50:       #fdfdfd;  /* surfaces.surface-1          */
+    --ds-black-500:      #717070;  /* inputs.default              */
+    --ds-black-800:      #1d1d1b;  /* texts.body-primary          */
+    --ds-grayscale-50:   #f1f1f1;  /* surfaces.surface-2          */
+    --ds-grayscale-100:  #d5d5d5;  /* surfaces.surface-3          */
+    --ds-grayscale-200:  #c1c1c1;  /* borders.border-1            */
+    --ds-grayscale-300:  #aaaaaa;  /* texts.text-placeholder      */
+    --ds-blue-400:       #078bf5;  /* buttons.primary.primary-hovered */
+    --ds-blue-500:       #054fe1;  /* generals.brand-primary      */
+    --ds-green-700:      #09781d;  /* generals.success            */
+    --ds-yellow-700:     #b39b00;  /* generals.warning            */
+    --ds-red-700:        #a41313;  /* generals.danger             */
+
+    /* ── Variables UI mapeadas a tokens DS ──────────────────── */
+    --bg:             var(--ds-black-50);        /* surfaces.surface-1     */
+    --surface:        var(--ds-grayscale-50);    /* surfaces.surface-2     */
+    --surface2:       var(--ds-grayscale-100);   /* surfaces.surface-3     */
+    --border:         var(--ds-grayscale-200);   /* borders.border-1       */
+    --accent:         var(--ds-blue-500);        /* generals.brand-primary */
+    --accent-soft:    rgba(5, 79, 225, 0.1);
+    --accent-hover:   var(--ds-blue-400);
+    --green:          var(--ds-green-700);       /* generals.success       */
+    --green-soft:     rgba(9, 120, 29, 0.1);
+    --orange:         var(--ds-yellow-700);      /* generals.warning       */
+    --orange-soft:    rgba(179, 155, 0, 0.1);
+    --red:            var(--ds-red-700);         /* generals.danger        */
+    --text:           var(--ds-black-800);       /* texts.body-primary     */
+    --text-secondary: var(--ds-black-500);
+    --text-tertiary:  var(--ds-grayscale-300);   /* texts.text-placeholder */
+    /* ── DS Typography Tokens ───────────────────────────────── */
+    --ds-font-primary:             "Sora", sans-serif;
+    --ds-weight-light:             300;
+    --ds-weight-regular:           400;
+    --ds-weight-semibold:          600;
+    --ds-font-size-body-small:     12px;  /* font-size.body.small    */
+    --ds-font-size-body-medium:    14px;  /* font-size.body.medium   */
+    --ds-font-size-body-large:     16px;  /* font-size.body.large    */
+    --ds-font-size-h6:             16px;
+    --ds-font-size-h5:             18px;
+    --ds-font-size-h4:             20px;
+    --ds-font-size-h3:             24px;
+    --ds-font-size-h2:             28px;
+    --ds-font-size-h1:             32px;
+    --ds-line-height-body-small:   20px;  /* line-height.body.small  */
+    --ds-line-height-body-medium:  24px;  /* line-height.body.medium */
+    --ds-line-height-body-large:   24px;  /* line-height.body.large  */
+    --ds-line-height-h6:           20px;
+    --ds-line-height-h5:           24px;
+    --ds-line-height-h4:           28px;
+    --ds-line-height-h3:           32px;
+    --ds-line-height-h2:           36px;
+    --ds-line-height-h1:           44px;
+
+    --radius: 10px;
+    --radius-sm: 6px;
+    --font:       var(--ds-font-primary);
+    --mono: 'SF Mono', 'Fira Code', 'Consolas', monospace;
+    --transition: 0.18s ease;
+  }
+
+  body {
+    font-family: var(--font);
+    background: var(--bg);
+    color: var(--text);
+    font-size: var(--ds-font-size-body-medium);
+    line-height: var(--ds-line-height-body-medium);
+    height: 100vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+  }
+
+  /* ── Header ─────────────────────────────────────────────────── */
+  .header {
+    padding: 14px 16px 12px;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .header-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 4px;
+  }
+
+  .logo {
+    width: 24px;
+    height: 24px;
+    background: var(--accent);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: var(--ds-font-size-body-medium);
+    flex-shrink: 0;
+  }
+
+  .header h1 {
+    font-size: var(--ds-font-size-body-medium);
+    font-weight: var(--ds-weight-semibold);
+    letter-spacing: -0.2px;
+  }
+
+  .header-sub {
+    font-size: var(--ds-font-size-body-small);
+    color: var(--text-secondary);
+    padding-left: 32px;
+  }
+
+  /* ── Tabs ───────────────────────────────────────────────────── */
+  .tabs {
+    display: flex;
+    gap: 2px;
+    padding: 10px 16px 0;
+    border-bottom: 1px solid var(--border);
+    flex-shrink: 0;
+  }
+
+  .tab {
+    padding: 6px 12px;
+    border-radius: var(--radius-sm) var(--radius-sm) 0 0;
+    font-size: var(--ds-font-size-body-small);
+    font-weight: var(--ds-weight-light);
+    font-weight: var(--ds-weight-semibold);
+    color: var(--text-secondary);
+    cursor: pointer;
+    border: none;
+    background: transparent;
+    transition: color var(--transition), background var(--transition);
+    position: relative;
+    bottom: -1px;
+  }
+
+  .tab.active {
+    color: var(--accent);
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-bottom-color: var(--surface);
+  }
+
+  .tab:not(.active):hover {
+    color: var(--text);
+  }
+
+  /* ── Content area ───────────────────────────────────────────── */
+  .content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 14px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .panel { display: none; flex-direction: column; gap: 12px; }
+  .panel.active { display: flex; }
+
+  /* ── Empty state ─────────────────────────────────────────────── */
+  .empty-state {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    flex: 1;
+    min-height: 200px;
+    text-align: center;
+    color: var(--text-secondary);
+  }
+
+  .empty-icon {
+    font-size: 32px;
+    opacity: 0.5;
+  }
+
+  .empty-state p { font-size: var(--ds-font-size-body-small); max-width: 220px; line-height: var(--ds-line-height-body-small); }
+
+  /* ── Action button ───────────────────────────────────────────── */
+  .btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+    padding: 9px 16px;
+    border-radius: var(--radius-sm);
+    font-size: var(--ds-font-size-body-medium);
+    font-weight: var(--ds-weight-semibold);
+    cursor: pointer;
+    border: none;
+    transition: all var(--transition);
+  }
+
+  .btn-primary {
+    background: var(--accent);
+    color: #fff;
+    width: 100%;
+  }
+
+  .btn-primary:hover { background: var(--accent-hover); }
+  .btn-primary:active { transform: scale(0.98); }
+
+  .btn-secondary {
+    background: var(--surface2);
+    color: var(--text);
+    font-size: var(--ds-font-size-body-small);
+    padding: 5px 10px;
+  }
+
+  .btn-secondary:hover { background: var(--border); }
+
+  /* ── Result card ─────────────────────────────────────────────── */
+  .result-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .result-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 12px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .result-title {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: var(--ds-weight-semibold);
+    font-size: var(--ds-font-size-body-medium);
+  }
+
+  .node-type-badge {
+    font-size: var(--ds-font-size-body-small);
+    font-weight: var(--ds-weight-semibold);
+    padding: 2px 7px;
+    border-radius: 999px;
+    background: var(--accent-soft);
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+
+  .layer-count {
+    font-size: var(--ds-font-size-body-small);
+    color: var(--text-secondary);
+  }
+
+  /* ── ASCII tree ──────────────────────────────────────────────── */
+  .ascii-block {
+    padding: 12px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .ascii-label {
+    font-size: var(--ds-font-size-body-small);
+    font-weight: var(--ds-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+  }
+
+  .ascii-tree {
+    font-family: var(--mono);
+    font-size: var(--ds-font-size-body-small);
+    line-height: var(--ds-line-height-body-small);
+    color: var(--text);
+    white-space: pre;
+    overflow-x: auto;
+    background: var(--bg);
+    border-radius: var(--radius-sm);
+    padding: 10px;
+  }
+
+  .ascii-tree .semantic {
+    color: var(--text-secondary);
+    font-style: normal;
+  }
+
+  .copy-bar {
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 12px;
+    gap: 6px;
+    border-top: 1px solid var(--border);
+    background: var(--surface);
+  }
+
+  /* ── Enriched table ──────────────────────────────────────────── */
+  .enriched-block {
+    padding: 12px;
+  }
+
+  .enriched-label {
+    font-size: var(--ds-font-size-body-small);
+    font-weight: var(--ds-weight-semibold);
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text-tertiary);
+    margin-bottom: 8px;
+  }
+
+  .layer-row {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    padding: 8px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border);
+    margin-bottom: 6px;
+    transition: border-color var(--transition);
+  }
+
+  .layer-row:hover { border-color: var(--accent); }
+  .layer-row.has-def { border-color: var(--surface2); }
+
+  .layer-row-top {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .layer-indent {
+    display: inline-block;
+    width: 14px;
+    height: 1px;
+    flex-shrink: 0;
+  }
+
+  .layer-name {
+    font-weight: var(--ds-weight-semibold);
+    font-size: var(--ds-font-size-body-small);
+    flex: 1;
+  }
+
+  .layer-type-pill {
+    font-size: var(--ds-font-size-body-small);
+    padding: 1px 6px;
+    border-radius: 999px;
+    background: var(--surface2);
+    color: var(--text-secondary);
+  }
+
+  .layer-def {
+    font-size: var(--ds-font-size-body-small);
+    color: var(--text-secondary);
+    padding-left: 20px;
+    line-height: var(--ds-line-height-body-small);
+  }
+
+  .layer-purpose {
+    font-size: var(--ds-font-size-body-small);
+    color: var(--text-tertiary);
+    padding-left: 20px;
+    font-style: italic;
+  }
+
+  .layer-usage-tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-size: var(--ds-font-size-body-small);
+    padding: 2px 6px;
+    border-radius: 4px;
+    background: var(--green-soft);
+    color: var(--green);
+    margin-left: 20px;
+    margin-top: 2px;
+    max-width: calc(100% - 20px);
+    word-break: break-word;
+    white-space: normal;
+  }
+
+  .no-match {
+    font-size: var(--ds-font-size-body-small);
+    color: var(--text-tertiary);
+    font-style: italic;
+    padding-left: 20px;
+  }
+
+  /* ── Library panel ───────────────────────────────────────────── */
+  .lib-search {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 7px 10px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    transition: border-color var(--transition);
+  }
+
+  .lib-search:focus-within { border-color: var(--accent); }
+
+  .lib-search input {
+    flex: 1;
+    background: transparent;
+    border: none;
+    outline: none;
+    color: var(--text);
+    font-size: var(--ds-font-size-body-small);
+    font-family: var(--font);
+  }
+
+  .lib-search input::placeholder { color: var(--text-tertiary); }
+
+  .lib-categories {
+    display: flex;
+    gap: 6px;
+    flex-wrap: wrap;
+  }
+
+  .cat-btn {
+    font-size: var(--ds-font-size-body-small);
+    padding: 4px 10px;
+    border-radius: 999px;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all var(--transition);
+  }
+
+  .cat-btn.active, .cat-btn:hover {
+    background: var(--accent-soft);
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  .lib-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .lib-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-sm);
+    padding: 10px 12px;
+    transition: border-color var(--transition);
+  }
+
+  .lib-card:hover { border-color: var(--accent); }
+
+  .lib-card-top {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 5px;
+  }
+
+  .lib-name {
+    font-weight: var(--ds-weight-semibold);
+    font-size: var(--ds-font-size-body-small);
+    font-family: var(--mono);
+    color: var(--accent);
+  }
+
+  .lib-cat-badge {
+    font-size: var(--ds-font-size-body-small);
+    padding: 1px 5px;
+    border-radius: 3px;
+    background: var(--surface2);
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+
+  .lib-definition {
+    font-size: var(--ds-font-size-body-small);
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+
+  .lib-purpose {
+    font-size: var(--ds-font-size-body-small);
+    color: var(--text-secondary);
+    margin-bottom: 5px;
+  }
+
+  .lib-usage {
+    font-size: var(--ds-font-size-body-small);
+    color: var(--green);
+    background: var(--green-soft);
+    border-radius: 4px;
+    padding: 3px 6px;
+    line-height: var(--ds-line-height-body-small);
+  }
+
+  .lib-empty {
+    text-align: center;
+    color: var(--text-tertiary);
+    font-size: var(--ds-font-size-body-small);
+    padding: 24px;
+  }
+
+  /* ── Error / toast ───────────────────────────────────────────── */
+  .toast {
+    position: fixed;
+    bottom: 12px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: var(--red);
+    color: #fff;
+    font-size: var(--ds-font-size-body-small);
+    padding: 7px 14px;
+    border-radius: var(--radius-sm);
+    opacity: 0;
+    transition: opacity 0.2s;
+    pointer-events: none;
+    z-index: 999;
+    white-space: nowrap;
+  }
+
+  .toast.show { opacity: 1; }
+
+  .toast-ok {
+    background: var(--green);
+    color: #fff;
+  }
+
+  /* ── Scrollbar ───────────────────────────────────────────────── */
+  ::-webkit-scrollbar { width: 5px; }
+  ::-webkit-scrollbar-track { background: transparent; }
+  ::-webkit-scrollbar-thumb { background: var(--border); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--text-tertiary); }
+</style>
+</head>
+<body>
+
+<!-- Header -->
+<div class="header">
+  <div class="header-top">
+    <div class="logo">🧩</div>
+    <h1>DS Doc Assistant</h1>
+  </div>
+  <div class="header-sub">Documentación asistida para componentes del Design System</div>
+</div>
+
+<!-- Tabs -->
+<div class="tabs">
+  <button class="tab active" onclick="switchTab('structure')">📐 Estructura</button>
+  <button class="tab" onclick="switchTab('library')">📖 Librería</button>
+</div>
+
+<!-- Content -->
+<div class="content">
+
+  <!-- Panel: Estructura -->
+  <div class="panel active" id="panel-structure">
+    <button class="btn btn-primary" onclick="requestStructure()">
+      ✦ Generar documentación del componente
+    </button>
+    <div id="structure-results" style="display:flex;flex-direction:column;gap:10px;">
+      <div class="empty-state">
+        <div class="empty-icon">⬡</div>
+        <p>Selecciona uno o más componentes en el canvas y presiona el botón para generar su documentación estructural.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Panel: Librería -->
+  <div class="panel" id="panel-library">
+    <div class="lib-search">
+      <span style="color:var(--text-tertiary);font-size:13px;">⌕</span>
+      <input type="text" id="lib-search-input" placeholder="Buscar elemento (label, icon, slot…)" oninput="filterLibrary()">
+    </div>
+    <div class="lib-categories" id="lib-categories"></div>
+    <div class="lib-grid" id="lib-grid">
+      <div class="empty-state">
+        <div class="empty-icon">📖</div>
+        <p>Cargando librería…</p>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast"></div>
+
+<script>
+// ─── Supabase config ────────────────────────────────────────────
+const SUPABASE_URL = 'https://agqyllozyhunxcenoysw.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_UW26qaMmZBhnBK8by4TxCw_bqb3fgP5';
+const TABLE_NAME   = 'nomenclatura_elementos';
+
+// ─── State ─────────────────────────────────────────────────────
+let libraryData    = null;
+let activeCategory = 'all';
+
+// ─── Fetch desde Supabase ───────────────────────────────────────
+async function fetchLibraryFromSupabase() {
+  const res = await fetch(
+    `${SUPABASE_URL}/rest/v1/${TABLE_NAME}?select=*&order=id.asc`,
+    {
+      headers: {
+        'apikey':        SUPABASE_KEY,
+        'Authorization': `Bearer ${SUPABASE_KEY}`,
+        'Content-Type':  'application/json',
+      },
+    }
+  );
+  if (!res.ok) throw new Error(`Supabase ${res.status}: ${res.statusText}`);
+  return res.json();
+}
+
+// ─── Init ───────────────────────────────────────────────────────
+async function initLibrary() {
+  const grid = document.getElementById('lib-grid');
+  grid.innerHTML = `
+    <div class="empty-state">
+      <div class="empty-icon" style="font-size:20px;animation:spin 1s linear infinite">↻</div>
+      <p>Conectando con Supabase…</p>
+    </div>`;
+
+  try {
+    libraryData = await fetchLibraryFromSupabase();
+    buildCategoryButtons();
+    renderLibraryEntries(libraryData);
+    parent.postMessage({
+      pluginMessage: { type: 'library-loaded', rows: libraryData }
+    }, '*');
+  } catch (err) {
+    grid.innerHTML = `
+      <div class="empty-state">
+        <div class="empty-icon">⚠️</div>
+        <p>Error al cargar la librería.<br><small style="color:var(--text-tertiary)">${err.message}</small></p>
+        <button class="btn btn-secondary" onclick="initLibrary()">Reintentar</button>
+      </div>`;
+    showToast('No se pudo conectar con Supabase', true);
+  }
+}
+
+// ─── Tab switching ──────────────────────────────────────────────
+function switchTab(id) {
+  document.querySelectorAll('.tab').forEach((t, i) => {
+    t.classList.toggle('active', ['structure','library'][i] === id);
+  });
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-' + id).classList.add('active');
+  if (id === 'library' && libraryData) renderLibrary();
+}
+
+// ─── Request structure ──────────────────────────────────────────
+function requestStructure() {
+  parent.postMessage({ pluginMessage: { type: 'generate-structure' } }, '*');
+}
+
+// ─── Messages from main thread ──────────────────────────────────
+window.onmessage = (event) => {
+  const msg = event.data.pluginMessage;
+  if (!msg) return;
+  if (msg.type === 'structure-result') renderStructureResults(msg.results);
+  if (msg.type === 'error') showToast(msg.message, true);
+};
+
+// ─── Render structure results ───────────────────────────────────
+function renderStructureResults(results) {
+  const container = document.getElementById('structure-results');
+  container.innerHTML = '';
+
+  if (!results || results.length === 0) {
+    container.innerHTML = `<div class="empty-state"><div class="empty-icon">⬡</div><p>No se encontraron resultados.</p></div>`;
+    return;
+  }
+
+  results.forEach(result => {
+    const card = document.createElement('div');
+    card.className = 'result-card';
+
+    card.innerHTML = `
+      <div class="result-header">
+        <div class="result-title">
+          <span>${escapeHtml(result.componentName)}</span>
+          <span class="node-type-badge">${result.nodeType}</span>
+        </div>
+        <span class="layer-count">${result.layerCount} capas</span>
+      </div>`;
+
+    // ASCII tree
+    const asciiBlock = document.createElement('div');
+    asciiBlock.className = 'ascii-block';
+    asciiBlock.innerHTML = `<div class="ascii-label">Diagrama estructural</div>`;
+    const pre = document.createElement('pre');
+    pre.className = 'ascii-tree';
+    pre.textContent = result.ascii;
+    asciiBlock.appendChild(pre);
+    card.appendChild(asciiBlock);
+
+    // Copy bar
+    const copyBar = document.createElement('div');
+    copyBar.className = 'copy-bar';
+    copyBar.innerHTML = `<button class="btn btn-secondary" onclick="copyAscii(this, ${JSON.stringify(result.ascii)})">⎘ Copiar árbol</button>`;
+    card.appendChild(copyBar);
+
+    // Enriched layers
+    const enrichedBlock = document.createElement('div');
+    enrichedBlock.className = 'enriched-block';
+    enrichedBlock.innerHTML = `<div class="enriched-label">Capas enriquecidas — ScannLab Component Element Library</div>`;
+
+    result.enriched.forEach(layer => {
+      const row = document.createElement('div');
+      row.className = 'layer-row' + (layer.nombre_scannlab ? ' has-def' : '');
+      const indentWidth = layer.depth * 14;
+
+      row.innerHTML = `
+        <div class="layer-row-top">
+          <span class="layer-indent" style="width:${indentWidth}px;min-width:${indentWidth}px"></span>
+          <span class="layer-name">${escapeHtml(layer.name)}</span>
+          <span class="layer-type-pill">${layer.type}</span>
+          ${layer.nivel_atomico ? `<span class="lib-cat-badge" style="margin-left:auto">${escapeHtml(layer.nivel_atomico)}</span>` : ''}
+        </div>`;
+
+      if (layer.nombre_scannlab) {
+        row.innerHTML += `<div class="layer-def">📌 <strong>${escapeHtml(layer.nombre_scannlab)}</strong>${layer.definicion ? ' — ' + escapeHtml(layer.definicion) : ''}</div>`;
+        if (layer.categoria) row.innerHTML += `<div class="layer-purpose">Categoría: ${escapeHtml(layer.categoria)}</div>`;
+      } else {
+        row.innerHTML += `<div class="no-match">Sin match en la librería — revisá el naming de la capa</div>`;
+      }
+
+      enrichedBlock.appendChild(row);
+    });
+
+    card.appendChild(enrichedBlock);
+    container.appendChild(card);
+  });
+}
+
+// ─── Copy ASCII ─────────────────────────────────────────────────
+function copyAscii(btn, text) {
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copiado';
+    setTimeout(() => { btn.textContent = '⎘ Copiar árbol'; }, 1800);
+  }).catch(() => showToast('No se pudo copiar al portapapeles', true));
+}
+
+// ─── Library panel ─────────────────────────────────────────────
+function buildCategoryButtons() {
+  if (!libraryData) return;
+  const cats = ['all', ...new Set(libraryData.map(r => r.categoria).filter(Boolean))];
+  const container = document.getElementById('lib-categories');
+  container.innerHTML = '';
+
+  cats.forEach(cat => {
+    const btn = document.createElement('button');
+    btn.className = 'cat-btn' + (cat === 'all' ? ' active' : '');
+    btn.textContent = cat === 'all' ? 'Todos' : cat;
+    btn.dataset.cat = cat;
+    btn.onclick = () => {
+      document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      activeCategory = cat;
+      filterLibrary();
+    };
+    container.appendChild(btn);
+  });
+}
+
+function filterLibrary() {
+  if (!libraryData) return;
+  const query = document.getElementById('lib-search-input').value.toLowerCase().trim();
+  let rows = libraryData;
+  if (activeCategory !== 'all') rows = rows.filter(r => r.categoria === activeCategory);
+  if (query) {
+    rows = rows.filter(r =>
+      (r.nombre_scannlab  || '').toLowerCase().includes(query) ||
+      (r.layer_name_figma || '').toLowerCase().includes(query) ||
+      (r.definicion       || '').toLowerCase().includes(query) ||
+      (r.categoria        || '').toLowerCase().includes(query)
+    );
+  }
+  renderLibraryEntries(rows);
+}
+
+function renderLibrary() {
+  buildCategoryButtons();
+  filterLibrary();
+}
+
+function renderLibraryEntries(rows) {
+  const grid = document.getElementById('lib-grid');
+  grid.innerHTML = '';
+
+  if (!rows || rows.length === 0) {
+    grid.innerHTML = '<div class="lib-empty">Sin resultados para esta búsqueda.</div>';
+    return;
+  }
+
+  rows.forEach(row => {
+    const card = document.createElement('div');
+    card.className = 'lib-card';
+    card.innerHTML = `
+      <div class="lib-card-top">
+        <span class="lib-name">${escapeHtml(row.nombre_scannlab || row.id)}</span>
+        <span class="lib-cat-badge">${escapeHtml(row.categoria || '—')}</span>
+        ${row.nivel_atomico ? `<span class="lib-cat-badge" style="background:var(--accent-soft);color:var(--accent)">${escapeHtml(row.nivel_atomico)}</span>` : ''}
+      </div>
+      ${row.layer_name_figma ? `<div class="layer-purpose" style="margin-bottom:4px">🔖 Figma layer: <code style="font-family:var(--mono);font-size:10.5px">${escapeHtml(row.layer_name_figma)}</code></div>` : ''}
+      <div class="lib-definition">${escapeHtml(row.definicion || '')}</div>
+    `;
+    grid.appendChild(card);
+  });
+}
+
+// ─── Toast ──────────────────────────────────────────────────────
+function showToast(msg, isError = false) {
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.className = 'toast show' + (isError ? '' : ' toast-ok');
+  setTimeout(() => { el.className = 'toast'; }, 2800);
+}
+
+// ─── Utils ──────────────────────────────────────────────────────
+function escapeHtml(str) {
+  if (!str) return '';
+  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+// ─── Spin keyframe ───────────────────────────────────────────────
+const _style = document.createElement('style');
+_style.textContent = '@keyframes spin { to { transform: rotate(360deg); } }';
+document.head.appendChild(_style);
+
+// ─── Boot ───────────────────────────────────────────────────────
+initLibrary();
+</script>
+</body>
+</html>

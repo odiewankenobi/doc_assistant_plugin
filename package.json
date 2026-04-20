@@ -1,0 +1,14 @@
+{
+  "name": "ds-doc-assistant",
+  "version": "1.0.0",
+  "description": "Sistema de documentación asistida para componentes del Design System",
+  "scripts": {
+    "build": "tsc && node scripts/bundle-ui.js",
+    "watch": "tsc --watch",
+    "dev": "tsc && node scripts/bundle-ui.js"
+  },
+  "devDependencies": {
+    "@figma/plugin-typings": "^1.90.0",
+    "typescript": "^5.3.3"
+  }
+}
